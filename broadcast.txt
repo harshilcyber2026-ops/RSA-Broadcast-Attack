@@ -1,0 +1,37 @@
+RSA Broadcast Attack Challenge — FlagVault CTF
+===============================================
+Same secret message was encrypted for 3 different recipients.
+All used e = 3, but different (n, d) key pairs.
+
+Public Key Parameters (e = 3 for all)
+---------------------------------------
+Recipient 1:
+  n1 = 6901746346790563787528291967066213706886611607676727823055800540072957
+  e  = 3
+  c1 = 5036129468364113910428963304737354663181438489735747092663755687990874
+
+Recipient 2:
+  n2 = 6901746346790563787621828250261356072659623087734882980372191729684641
+  e  = 3
+  c2 = 5326928532739378412135367398580727584299458288280679437965219285106534
+
+Recipient 3:
+  n3 = 6901746346790563787808900638245669412904192004228737330463495266766091
+  e  = 3
+  c3 = 6614031198677325980340134081462854250739110660751674278386450127143075
+
+Notes:
+  - Encryption: ci = m^3 mod ni
+  - The same plaintext m was sent to all three recipients
+  - m < min(n1, n2, n3)
+  - The plaintext encodes to ASCII
+  - The flag is FlagVault{<decoded_plaintext>}
+
+Attack Hint:
+  Use the Chinese Remainder Theorem to reconstruct m^3 over the integers,
+  then compute the integer cube root.
+  
+  Step 1: N = n1 * n2 * n3
+  Step 2: M^3 = CRT(c1,n1 ; c2,n2 ; c3,n3)  [since m < each ni, m^3 < N]
+  Step 3: m = cube_root(M^3)  [exact integer cube root, no modular reduction]
+  Step 4: flag = FlagVault{ m.to_bytes().decode('ascii') }

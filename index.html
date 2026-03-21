@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>RSA Broadcast Attack — FlagVault CTF</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>"/>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="#" class="nav-brand"><span class="bracket">[</span><span class="brand-flag">FLAG</span>VAULT<span class="bracket">]</span></a>
+  <ul class="nav-links">
+    <li><a href="#">Challenges</a></li>
+    <li><a href="#" class="active">Broadcast</a></li>
+    <li><a href="#">Scoreboard</a></li>
+  </ul>
+  <div class="nav-status"><div class="status-dot"></div>CHALLENGE LIVE</div>
+</nav>
+
+<div class="page-wrap">
+
+  <header class="page-header" data-index="C7">
+    <div class="page-eyebrow">CRYPTOGRAPHY · CHALLENGE #C7</div>
+    <h1 class="page-title"><span class="hl2">RSA</span> <span class="hl">Broadcast Attack</span></h1>
+    <p class="page-desc">
+      The same secret message was encrypted for three recipients.<br/>
+      Each used RSA with <code>e = 3</code>, but different moduli. Recover the original message.
+    </p>
+  </header>
+
+  <div class="stats-strip">
+    <div class="stat-box"><span class="stat-val">400</span><span class="stat-label">Points</span></div>
+    <div class="stat-box"><span class="stat-val red">Hard</span><span class="stat-label">Difficulty</span></div>
+    <div class="stat-box"><span class="stat-val amber">13</span><span class="stat-label">Solves</span></div>
+    <div class="stat-box"><span class="stat-val">Crypto</span><span class="stat-label">Category</span></div>
+  </div>
+
+  <!-- Download bar -->
+  <div class="download-bar">
+    <span class="dl-icon">📄</span>
+    <span class="dl-name">broadcast.txt</span>
+    <span class="dl-size">1.2 KB · 3 RSA ciphertexts (e=3)</span>
+    <a href="files/broadcast.txt" download class="btn btn-primary dl-btn">↓ Download File</a>
+  </div>
+
+  <div class="bc-layout">
+
+    <!-- ══════ LEFT ══════ -->
+    <div class="bc-left">
+
+      <!-- Intercepted ciphertexts display -->
+      <div class="sec-divider"><h3>Intercepted Ciphertexts</h3></div>
+      <div class="intercept-panel">
+        <div class="ip-bar">
+          <span class="ip-dot ip-r"></span><span class="ip-dot ip-y"></span><span class="ip-dot ip-g"></span>
+          <span class="ip-title">BROADCAST INTERCEPT // 3 RECIPIENTS</span>
+        </div>
+        <div class="ip-body">
+          <div class="recipient-card" id="r1">
+            <div class="rc-header"><span class="rc-badge">RECIPIENT 1</span><span class="rc-e">e = 3</span></div>
+            <div class="rc-row"><span class="rc-k">n<sub>1</sub></span><span class="rc-v" id="val-n1">6901746346790563787528291967066213706886611607676727823055800540072957</span></div>
+            <div class="rc-row"><span class="rc-k">c<sub>1</sub></span><span class="rc-v rc-c" id="val-c1">5036129468364113910428963304737354663181438489735747092663755687990874</span></div>
+          </div>
+          <div class="recipient-card" id="r2">
+            <div class="rc-header"><span class="rc-badge">RECIPIENT 2</span><span class="rc-e">e = 3</span></div>
+            <div class="rc-row"><span class="rc-k">n<sub>2</sub></span><span class="rc-v" id="val-n2">6901746346790563787621828250261356072659623087734882980372191729684641</span></div>
+            <div class="rc-row"><span class="rc-k">c<sub>2</sub></span><span class="rc-v rc-c" id="val-c2">5326928532739378412135367398580727584299458288280679437965219285106534</span></div>
+          </div>
+          <div class="recipient-card" id="r3">
+            <div class="rc-header"><span class="rc-badge">RECIPIENT 3</span><span class="rc-e">e = 3</span></div>
+            <div class="rc-row"><span class="rc-k">n<sub>3</sub></span><span class="rc-v" id="val-n3">6901746346790563787808900638245669412904192004228737330463495266766091</span></div>
+            <div class="rc-row"><span class="rc-k">c<sub>3</sub></span><span class="rc-v rc-c" id="val-c3">6614031198677325980340134081462854250739110660751674278386450127143075</span></div>
+          </div>
+          <div class="ip-formula">
+            <span class="ipf-k">Encryption:</span>
+            <span class="ipf-v">c<sub>i</sub> = m<sup>3</sup> mod n<sub>i</sub></span>
+            <span class="ipf-sep">·</span>
+            <span class="ipf-note">same m, different n<sub>i</sub></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Attack Solver -->
+      <div class="sec-divider"><h3>Interactive Attack Solver</h3></div>
+      <div class="solver-wrap">
+
+        <!-- Step 1: CRT -->
+        <div class="slv-step" id="s1">
+          <div class="slv-hdr" onclick="toggleSlv(1)">
+            <div class="slv-n">01</div>
+            <div class="slv-ti"><strong>Chinese Remainder Theorem</strong><span>Reconstruct m³ from (c₁,n₁), (c₂,n₂), (c₃,n₃)</span></div>
+            <span class="slv-tog" id="s1t">▶ Open</span>
+          </div>
+          <div class="slv-body hidden" id="s1b">
+            <p class="slv-p">CRT finds the unique x with x ≡ c₁ mod n₁, x ≡ c₂ mod n₂, x ≡ c₃ mod n₃.<br/>
+            Since m &lt; each nᵢ, we have m³ &lt; n₁n₂n₃, so CRT gives m³ exactly — no modular reduction!</p>
+            <div class="crt-diagram" id="crt-diagram">
+              <div class="crtd-row"><span class="crtd-eq">x ≡ c₁ (mod n₁)</span></div>
+              <div class="crtd-row"><span class="crtd-eq">x ≡ c₂ (mod n₂)</span></div>
+              <div class="crtd-row"><span class="crtd-eq">x ≡ c₃ (mod n₃)</span></div>
+              <div class="crtd-arrow">⟹ CRT</div>
+              <div class="crtd-result">x = m³  (exact, over ℤ)</div>
+            </div>
+            <button class="btn btn-primary slv-btn" id="s1-btn" onclick="runCRT()">⚡ Run CRT</button>
+            <div class="slv-res hidden" id="s1-res"></div>
+          </div>
+        </div>
+
+        <!-- Step 2: Cube Root -->
+        <div class="slv-step locked" id="s2">
+          <div class="slv-hdr" onclick="toggleSlv(2)">
+            <div class="slv-n">02</div>
+            <div class="slv-ti"><strong>Integer Cube Root</strong><span>m = ∛(m³)  — Newton's method, exact integer</span></div>
+            <span class="slv-tog" id="s2t">🔒</span>
+          </div>
+          <div class="slv-body hidden" id="s2b">
+            <p class="slv-p">Take the integer cube root of M³. This is not modular — it's an exact integer root using Newton's method or binary search.</p>
+            <div class="newtons-viz" id="newtons-viz">
+              <div class="nv-label">// NEWTON'S METHOD: x ← (2x + M³/x²) / 3</div>
+              <div class="nv-steps" id="nv-steps"></div>
+            </div>
+            <button class="btn btn-primary slv-btn" id="s2-btn" onclick="runCubeRoot()" disabled>▶ Integer Cube Root</button>
+            <div class="slv-res hidden" id="s2-res"></div>
+          </div>
+        </div>
+
+        <!-- Step 3: Decode -->
+        <div class="slv-step locked" id="s3">
+          <div class="slv-hdr" onclick="toggleSlv(3)">
+            <div class="slv-n">03</div>
+            <div class="slv-ti"><strong>Decode Integer → ASCII</strong><span>m → big-endian bytes → UTF-8 string</span></div>
+            <span class="slv-tog" id="s3t">🔒</span>
+          </div>
+          <div class="slv-body hidden" id="s3b">
+            <div class="decode-viz" id="decode-viz"></div>
+            <button class="btn btn-primary slv-btn" id="s3-btn" onclick="runDecode()" disabled>▶ Decode to ASCII</button>
+            <div class="slv-res hidden" id="s3-res"></div>
+          </div>
+        </div>
+
+      </div><!-- /solver -->
+
+      <!-- Flag reveal -->
+      <div id="flag-reveal" class="flag-reveal hidden">
+        <div class="fr-glow"></div>
+        <div class="fr-icon">📡</div>
+        <h2 class="fr-title">Broadcast Cracked!</h2>
+        <p class="fr-sub">Håstad's Broadcast Attack — e=3 across multiple recipients leaks the plaintext entirely.</p>
+        <div class="fr-box">
+          <span class="fr-lbl">🚩 RECOVERED FLAG</span>
+          <code class="fr-val" id="fr-val"></code>
+          <button class="btn-copy-sm" onclick="copyFlag()">📋 Copy</button>
+          <div class="copy-toast hidden" id="copy-toast">✓ Copied!</div>
+        </div>
+        <div class="fr-proof">
+          <div class="fp-row"><span class="fp-k">N = n₁n₂n₃</span><span class="fp-v fp-n">~700 digit integer</span></div>
+          <div class="fp-row"><span class="fp-k">CRT(c₁,c₂,c₃)</span><span class="fp-v fp-crt">= m³ (exact)</span></div>
+          <div class="fp-row"><span class="fp-k">∛(m³)</span><span class="fp-v fp-root">= m (Newton's method)</span></div>
+          <div class="fp-row"><span class="fp-k">m.to_bytes()</span><span class="fp-v fp-bytes">= "h4st4d_br04dc4st_3=3_cr4ck3d"</span></div>
+          <div class="fp-row"><span class="fp-k">Flag</span><span class="fp-v fp-flag">FlagVault{h4st4d_br04dc4st_3=3_cr4ck3d}</span></div>
+        </div>
+      </div>
+
+    </div><!-- /left -->
+
+    <!-- ══════ RIGHT ══════ -->
+    <div class="bc-right">
+
+      <div class="sec-divider"><h3>Challenge Info</h3></div>
+      <div class="info-panel">
+        <div class="info-row"><span class="info-key">Cipher</span><span class="tag tag-red">Textbook RSA</span></div>
+        <div class="info-row"><span class="info-key">Attack</span><span class="tag tag-amber">Håstad Broadcast</span></div>
+        <div class="info-row"><span class="info-key">e</span><code>3 (all recipients)</code></div>
+        <div class="info-row"><span class="info-key">Tool</span><code>CRT + Cube Root</code></div>
+        <div class="info-row"><span class="info-key">Points</span><span style="color:var(--accent);font-family:var(--font-hud)">400</span></div>
+      </div>
+
+      <div class="sec-divider"><h3>Background</h3></div>
+      <div class="desc-block">
+        <p>Håstad's broadcast attack (1985) exploits RSA with small <code>e</code> when the same message is sent to multiple recipients.</p>
+        <br/>
+        <p>With <code>e = 3</code> recipients, the Chinese Remainder Theorem reconstructs <code>m³</code> over the integers. Since <code>m &lt; min(nᵢ)</code>, we have <code>m³ &lt; n₁n₂n₃</code>, so taking the cube root gives <code>m</code> exactly — no private key needed.</p>
+      </div>
+
+      <!-- Visual diagram -->
+      <div class="sec-divider"><h3>Why This Works</h3></div>
+      <div class="why-card">
+        <div class="wy-row">
+          <div class="wy-box wy-sender">📨<br/><span>Sender</span><br/><code>m</code></div>
+          <div class="wy-arrows">
+            <div class="wy-arr wy-a1">→ c₁=m³ mod n₁ →</div>
+            <div class="wy-arr wy-a2">→ c₂=m³ mod n₂ →</div>
+            <div class="wy-arr wy-a3">→ c₃=m³ mod n₃ →</div>
+          </div>
+          <div class="wy-recipients">
+            <div class="wy-r">👤 R₁</div>
+            <div class="wy-r">👤 R₂</div>
+            <div class="wy-r">👤 R₃</div>
+          </div>
+        </div>
+        <div class="wy-attack">
+          <div class="wy-at-label">🕵️ Attacker intercepts all 3 ciphertexts</div>
+          <div class="wy-at-steps">
+            <div class="wy-step">CRT(c₁,c₂,c₃) → m³</div>
+            <div class="wy-step">∛(m³) → m</div>
+            <div class="wy-step">decode(m) → flag</div>
+          </div>
+        </div>
+        <div class="vuln-note">
+          <span class="vn-label">⚠ KEY INSIGHT</span>
+          m &lt; nᵢ → m³ &lt; n₁·n₂·n₃ → CRT gives m³ over ℤ (not mod anything!). The cube root is then trivial.
+        </div>
+      </div>
+
+      <!-- CRT explanation -->
+      <div class="sec-divider"><h3>CRT Formula</h3></div>
+      <div class="crt-formula-box">
+        <div class="cfb-row"><code>N = n₁ × n₂ × n₃</code></div>
+        <div class="cfb-row"><code>Nᵢ = N / nᵢ</code></div>
+        <div class="cfb-row"><code>Mᵢ = Nᵢ⁻¹ mod nᵢ</code></div>
+        <div class="cfb-div"></div>
+        <div class="cfb-row cfb-hi"><code>m³ = (Σ cᵢ·Nᵢ·Mᵢ) mod N</code></div>
+        <div class="cfb-note">Since m³ &lt; N, no modular reduction occurs</div>
+      </div>
+
+      <!-- Python solve -->
+      <div class="sec-divider"><h3>Python Solve Script</h3></div>
+      <div class="code-block">
+        <div class="cb-lbl">// solution.py</div>
+        <pre class="cb-pre">n1 = 6901746346790563787528291967066213706886611607676727823055800540072957
+n2 = 6901746346790563787621828250261356072659623087734882980372191729684641
+n3 = 6901746346790563787808900638245669412904192004228737330463495266766091
+
+c1 = 5036129468364113910428963304737354663181438489735747092663755687990874
+c2 = 5326928532739378412135367398580727584299458288280679437965219285106534
+c3 = 6614031198677325980340134081462854250739110660751674278386450127143075
+
+# Step 1: CRT
+N = n1*n2*n3
+N1,N2,N3 = N//n1, N//n2, N//n3
+M1 = pow(N1,-1,n1); M2 = pow(N2,-1,n2); M3 = pow(N3,-1,n3)
+m_cubed = (c1*N1*M1 + c2*N2*M2 + c3*N3*M3) % N
+
+# Step 2: Integer cube root (Newton's method)
+x = m_cubed
+for _ in range(200):
+    x = (2*x + m_cubed // (x*x)) // 3
+    if x*x*x == m_cubed: break
+
+# Step 3: Decode
+m = x.to_bytes((x.bit_length()+7)//8, 'big')
+print(f"FlagVault{{{m.decode()}}}")</pre>
+      </div>
+
+      <!-- Hints -->
+      <div class="sec-divider"><h3>Hints</h3></div>
+      <div class="hints-list">
+        <div class="hint-card">
+          <div class="hint-header" onclick="toggleHint(1)"><span>💡 HINT 1</span><span class="hint-cost tag tag-green">−30 pts</span><span class="hint-toggle" id="h1t">▼ Reveal</span></div>
+          <div class="hint-body hidden" id="h1b">When the same message is encrypted with RSA e=3 for 3 different recipients, the Chinese Remainder Theorem lets you recover m³ over the integers (not mod anything). From there, just take the cube root.</div>
+        </div>
+        <div class="hint-card">
+          <div class="hint-header" onclick="toggleHint(2)"><span>💡 HINT 2</span><span class="hint-cost tag tag-red">−60 pts</span><span class="hint-toggle" id="h2t">▼ Reveal</span></div>
+          <div class="hint-body hidden" id="h2b">CRT: N=n₁·n₂·n₃, Nᵢ=N/nᵢ, Mᵢ=Nᵢ⁻¹ mod nᵢ. Then m³ = (c₁N₁M₁ + c₂N₂M₂ + c₃N₃M₃) mod N. Since m³ &lt; N, this equals m³ exactly. Use Python's <code>pow(N1, -1, n1)</code> for modular inverse.</div>
+        </div>
+        <div class="hint-card">
+          <div class="hint-header" onclick="toggleHint(3)"><span>💡 HINT 3</span><span class="hint-cost tag tag-purple">−90 pts</span><span class="hint-toggle" id="h3t">▼ Reveal</span></div>
+          <div class="hint-body hidden" id="h3b">For the integer cube root, use Newton's method: start with a large estimate, iterate x ← (2x + M³/x²)//3 until convergence. Then decode: <code>x.to_bytes((x.bit_length()+7)//8, 'big').decode('ascii')</code>.</div>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="sec-divider"><h3>Submit Flag</h3></div>
+      <div class="flag-submit-panel">
+        <div class="form-group flag-input-wrap">
+          <span class="flag-prefix">FlagVault{</span>
+          <input class="form-control" id="flag-input" type="text" placeholder="your_flag_here" autocomplete="off"/>
+        </div>
+        <button class="btn btn-primary" onclick="submitFlag()" style="width:100%">&gt;_ SUBMIT FLAG</button>
+        <div class="submit-result" id="flag-result"></div>
+      </div>
+
+    </div><!-- /right -->
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-brand">FLAG<span>VAULT</span> CTF</div>
+  <div class="footer-copy">Challenge #C7 · Cryptography · Håstad's RSA Broadcast Attack</div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
