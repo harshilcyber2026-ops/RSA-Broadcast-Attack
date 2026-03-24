@@ -11,11 +11,6 @@
 
 <nav class="nav">
   <a href="#" class="nav-brand"><span class="bracket">[</span><span class="brand-flag">FLAG</span>VAULT<span class="bracket">]</span></a>
-  <ul class="nav-links">
-    <li><a href="#">Challenges</a></li>
-    <li><a href="#" class="active">Broadcast</a></li>
-    <li><a href="#">Scoreboard</a></li>
-  </ul>
   <div class="nav-status"><div class="status-dot"></div>CHALLENGE LIVE</div>
 </nav>
 
@@ -29,13 +24,6 @@
       Each used RSA with <code>e = 3</code>, but different moduli. Recover the original message.
     </p>
   </header>
-
-  <div class="stats-strip">
-    <div class="stat-box"><span class="stat-val">400</span><span class="stat-label">Points</span></div>
-    <div class="stat-box"><span class="stat-val red">Hard</span><span class="stat-label">Difficulty</span></div>
-    <div class="stat-box"><span class="stat-val amber">13</span><span class="stat-label">Solves</span></div>
-    <div class="stat-box"><span class="stat-val">Crypto</span><span class="stat-label">Category</span></div>
-  </div>
 
   <!-- Download bar -->
   <div class="download-bar">
@@ -174,7 +162,6 @@
         <div class="info-row"><span class="info-key">Attack</span><span class="tag tag-amber">Håstad Broadcast</span></div>
         <div class="info-row"><span class="info-key">e</span><code>3 (all recipients)</code></div>
         <div class="info-row"><span class="info-key">Tool</span><code>CRT + Cube Root</code></div>
-        <div class="info-row"><span class="info-key">Points</span><span style="color:var(--accent);font-family:var(--font-hud)">400</span></div>
       </div>
 
       <div class="sec-divider"><h3>Background</h3></div>
@@ -253,35 +240,6 @@ for _ in range(200):
 m = x.to_bytes((x.bit_length()+7)//8, 'big')
 print(f"FlagVault{{{m.decode()}}}")</pre>
       </div>
-
-      <!-- Hints -->
-      <div class="sec-divider"><h3>Hints</h3></div>
-      <div class="hints-list">
-        <div class="hint-card">
-          <div class="hint-header" onclick="toggleHint(1)"><span>💡 HINT 1</span><span class="hint-cost tag tag-green">−30 pts</span><span class="hint-toggle" id="h1t">▼ Reveal</span></div>
-          <div class="hint-body hidden" id="h1b">When the same message is encrypted with RSA e=3 for 3 different recipients, the Chinese Remainder Theorem lets you recover m³ over the integers (not mod anything). From there, just take the cube root.</div>
-        </div>
-        <div class="hint-card">
-          <div class="hint-header" onclick="toggleHint(2)"><span>💡 HINT 2</span><span class="hint-cost tag tag-red">−60 pts</span><span class="hint-toggle" id="h2t">▼ Reveal</span></div>
-          <div class="hint-body hidden" id="h2b">CRT: N=n₁·n₂·n₃, Nᵢ=N/nᵢ, Mᵢ=Nᵢ⁻¹ mod nᵢ. Then m³ = (c₁N₁M₁ + c₂N₂M₂ + c₃N₃M₃) mod N. Since m³ &lt; N, this equals m³ exactly. Use Python's <code>pow(N1, -1, n1)</code> for modular inverse.</div>
-        </div>
-        <div class="hint-card">
-          <div class="hint-header" onclick="toggleHint(3)"><span>💡 HINT 3</span><span class="hint-cost tag tag-purple">−90 pts</span><span class="hint-toggle" id="h3t">▼ Reveal</span></div>
-          <div class="hint-body hidden" id="h3b">For the integer cube root, use Newton's method: start with a large estimate, iterate x ← (2x + M³/x²)//3 until convergence. Then decode: <code>x.to_bytes((x.bit_length()+7)//8, 'big').decode('ascii')</code>.</div>
-        </div>
-      </div>
-
-      <!-- Submit -->
-      <div class="sec-divider"><h3>Submit Flag</h3></div>
-      <div class="flag-submit-panel">
-        <div class="form-group flag-input-wrap">
-          <span class="flag-prefix">FlagVault{</span>
-          <input class="form-control" id="flag-input" type="text" placeholder="your_flag_here" autocomplete="off"/>
-        </div>
-        <button class="btn btn-primary" onclick="submitFlag()" style="width:100%">&gt;_ SUBMIT FLAG</button>
-        <div class="submit-result" id="flag-result"></div>
-      </div>
-
     </div><!-- /right -->
   </div>
 </div>
